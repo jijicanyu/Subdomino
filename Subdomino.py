@@ -1,17 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
-Changelog:
-	Version 0.1 - First release only subdomain enumeration
-
-Dependencies : 
-	Ping-v0.2 - pip install ping
-	Argparse  - pip install argparse
-
-Description : 
-
-Warning : Need to be run as root in order to ping
-"""
 import sys
 import argparse
 from subdomain_enum import *
@@ -30,7 +18,7 @@ if __name__ == "__main__":
 		exit()
 
 	# Banner and version
-	print "Subdomino - v" + version + ", by " + author + '\n'
+	print "Subdomino - v" + version + ", by " + author
 
 
 	# Start a subdomain enumeration

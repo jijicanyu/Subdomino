@@ -16,12 +16,15 @@ def init_enumeration():
 
 # CTRL+C Handler
 def signal_handler(signal, frame):
-	print "Subdomains founds : ",online_subdmn
+	global online_subdmn
+	online_subdmn = sorted(online_subdmn)
+	
+	print "\n[+] Subdomains founds : ",online_subdmn
 
 	# Save subdomain's list
-	with open('subdomain.lst','w+') as f:
+	with open('subdomains.lst','w+') as f:
 		f.write("\n".join(online_subdmn))
-	print "Exported in subdomain.lst"
+	print "\n[+] Exported in subdomain.lst"
 
 	# Exit the soft
 	exit(0)
@@ -65,7 +68,7 @@ def scan_subdomain(dest_addr, timeout = 1, count = 1, psize = 64):
 
 # Generate a list of potential subdomain
 def brute_with_file(domain):
-	print "[+] Brute subdomain from names.txt ..."
+	print "\n[+] Brute subdomain from names.txt ..."
 	# This interruption will manage CTRL+C in different states
 	signal.signal(signal.SIGINT, signal_handler)
 
@@ -74,30 +77,37 @@ def brute_with_file(domain):
 		
 		# Determine online subdomain
 		for index,subdmn in enumerate(dict_file):
-			if scan_subdomain("http://"+subdmn.strip()+"."+domain):
-				online_subdmn.append("http://"+subdmn.strip()+"."+domain)
+			clean_url = "http://"+subdmn.strip()+"."+domain
+			if not clean_url in online_subdmn and scan_subdomain(clean_url):
+				online_subdmn.append(clean_url)
 
 	
-
 # Extract subdomain from google results
 def crawl_google_for_subdomain(domain):
-	print "[+] Crawl from Google..."
+	print "\n[+] Crawl from Google..."
 	global online_subdmn
-	for i in range(0,10):
+
+	for i in range(0,4):
+		# Using Google Dork "*.domain"
 		google_source = requests.get('https://www.google.fr/search?&q=site:*.'+domain+"&start="+str(i*10)).text
 		websites = tuple(re.finditer(r'<cite>([^\'" <>]+)<\/cite>', google_source))
 
 		for website in websites:
-			print i, websites
-			clean_url = '/'.join(website.group(1).split('/',3)[:-1])
+			clean_url = ""
 			
-			if(not "http" in clean_url):
-				clean_url = "http://" + clean_url
+			# Handle result like bla.domain
+			if(not "http" in website.group(1)):
+				clean_url = "http://" + website.group(1)
+				clean_url = '/'.join(clean_url.split('/',3)[:-1])
 
-			if(not clean_url in online_subdmn and not "www" in clean_url):
+			# Handle result like http://bla.domain
+			else:
+				clean_url = '/'.join(website.group(1).split('/',3)[:-1])
+
+			if(not clean_url in online_subdmn):
 				online_subdmn.append(clean_url)
 
-	# Sort the result
+	# Sort the result for a clean output :)
 	online_subdmn = sorted(online_subdmn)
 	for subdmn in online_subdmn:
 		print "\033[92mFound - \033[0m" + subdmn
