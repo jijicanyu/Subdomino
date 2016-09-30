@@ -6,6 +6,7 @@ import argparse
 import socket
 import requests
 import signal
+import multiprocessing
 from ping import *
 
 # Initialize the global variable
@@ -18,7 +19,7 @@ def init_enumeration():
 def signal_handler(signal, frame):
 	global online_subdmn
 	online_subdmn = sorted(online_subdmn)
-	
+
 	print "\n[+] Subdomains founds : ",online_subdmn
 
 	# Save subdomain's list
@@ -82,15 +83,40 @@ def brute_with_file(domain):
 				online_subdmn.append(clean_url)
 
 	
+# Function for the multiprocessing crawl
+def crawl_google_for_subdomain_extract(stuff_to_get):
+  global google
+  stuff_got = []
+  
+  for thing in stuff_to_get:
+    stuff_got.append( requests.get(google + thing).text )
+
+  return stuff_got
+
+
 # Extract subdomain from google results
 def crawl_google_for_subdomain(domain):
 	print "\n[+] Crawl from Google..."
 	global online_subdmn
 
-	for i in range(0,4):
-		# Using Google Dork "*.domain"
-		google_source = requests.get('https://www.google.fr/search?&q=site:*.'+domain+"&start="+str(i*10)).text
-		websites = tuple(re.finditer(r'<cite>([^\'" <>]+)<\/cite>', google_source))
+	# Define number of results
+	stuff_that_needs_getting = []
+	for i in range(0,10):
+		stuff_that_needs_getting.append(str(i*10))
+
+	# Set a google URL global for the multithread
+	global google
+	google = 'https://www.google.fr/search?&q=site:*.'+domain+"&start="
+
+	# Use multi threads
+	pool = multiprocessing.Pool(processes=4)
+	pool_outputs = pool.map(crawl_google_for_subdomain_extract, stuff_that_needs_getting)
+	pool.close()
+	pool.join()
+
+	# Threads are done, now let parse theirs results
+	for google_source in pool_outputs:
+		websites = tuple(re.finditer(r'<cite>([^\'" <>]+)<\/cite>', google_source[0]))
 
 		for website in websites:
 			clean_url = ""
