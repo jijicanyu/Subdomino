@@ -143,3 +143,4 @@ def crawl_google_for_subdomain(domain):
 	online_subdmn = sorted(online_subdmn)
 	for subdmn in online_subdmn:
 		print "\033[92mFound - \033[0m" + subdmn
+
