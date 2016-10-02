@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
+import os
 import sys
 import argparse
 import socket
@@ -10,31 +11,23 @@ import multiprocessing
 from ping import *
 
 # Initialize the global variable
-def init_enumeration():
+def init_enumeration(nmap_arg):
+	# Storing all the subdomains
 	global online_subdmn
 	online_subdmn = []
+
+	# Handle nmap scan for every subdomain
+	global nmap
+	if (nmap_arg):
+		print "[OPTION] Nmap Scan enabled"
+	else:
+		print "[OPTION] Nmap Scan disabled"
+	nmap = nmap_arg
 
 
 # CTRL+C Handler
 def signal_handler(signal, frame):
 	enf_of_software()
-
-
-# Last function save everything
-def enf_of_software():
-	global online_subdmn
-	online_subdmn = sorted(online_subdmn)
-
-	print "\n[+] Subdomains founds : ",online_subdmn
-
-	# Save subdomain's list
-	with open('subdomains.lst','w+') as f:
-		f.write("\n".join(online_subdmn))
-	print "\n[+] Exported in subdomain.lst"
-
-	# Exit the soft
-	exit(0)
-
 
 	
 # Scan a subdomain to determine if it's online
@@ -115,7 +108,7 @@ def crawl_google_for_subdomain(domain):
 	google = 'https://www.google.fr/search?&q=site:*.'+domain+"&start="
 
 	# Use multi threads
-	pool = multiprocessing.Pool(processes=4)
+	pool = multiprocessing.Pool(processes=2)
 	pool_outputs = pool.map(crawl_google_for_subdomain_extract, stuff_that_needs_getting)
 	pool.close()
 	pool.join()
@@ -144,3 +137,50 @@ def crawl_google_for_subdomain(domain):
 	for subdmn in online_subdmn:
 		print "\033[92mFound - \033[0m" + subdmn
 
+
+# Start a nmap for every subdomains and store the result
+def nmap_subdomains():
+	if (nmap):
+		global online_subdmn
+		print "\n[+] NMAP Subdomains"
+		for subdmn in online_subdmn:
+			clean_url = subdmn.replace('https://','').replace('http://','')
+			print " NMAP for "+clean_url
+			os.system('nmap -F '+clean_url+' >> reports/'+subdmn.replace('://','_'))
+
+
+# Generating a report for every subdomain
+def generate_reports():
+	global online_subdmn
+	print "\n[+] Generating subdomain's report"
+	
+	if not os.path.exists('reports'):
+		os.mkdir('reports', 0755)
+
+	for subdmn in online_subdmn:
+		path = "reports/"+subdmn.replace('://','_')
+		if not os.path.exists(path):
+			os.mknod(path)
+
+
+# Last function save everything
+def enf_of_software():
+	# Sort the list for a clean output
+	global online_subdmn
+	online_subdmn = sorted(online_subdmn)
+	print "\n[+] Subdomains founds : ",online_subdmn
+
+	# Save subdomain's list
+	with open('subdomains.lst','w+') as f:
+		f.write("\n".join(online_subdmn))
+	print "\n[+] Exported in subdomain.lst"
+
+
+	# Start a report for every subdomain
+	generate_reports()
+
+	# Launch NMAP if necessary
+	nmap_subdomains()
+
+	# Exit the soft
+	exit(0)
