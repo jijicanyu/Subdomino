@@ -17,6 +17,11 @@ def init_enumeration():
 
 # CTRL+C Handler
 def signal_handler(signal, frame):
+	enf_of_software()
+
+
+# Last function save everything
+def enf_of_software():
 	global online_subdmn
 	online_subdmn = sorted(online_subdmn)
 
@@ -29,6 +34,7 @@ def signal_handler(signal, frame):
 
 	# Exit the soft
 	exit(0)
+
 
 	
 # Scan a subdomain to determine if it's online

@@ -1,6 +1,7 @@
 # Subdomino
+![Image of Subdomino](http://i.imgur.com/hD6yeux.png)
 ```
-Warning : Need to be run as **root** in order to ping a domain, due to the socket use !
+Warning : Need to be run as root in order to ping a domain, due to the socket use !
 ```
 
 ## Dependencies 

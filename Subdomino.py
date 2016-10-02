@@ -25,3 +25,7 @@ if __name__ == "__main__":
 	init_enumeration()
 	crawl_google_for_subdomain(results.domain)
 	brute_with_file(results.domain)
+
+
+	# Save everything and end the script
+	end_of_software()
