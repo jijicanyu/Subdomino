@@ -15,6 +15,7 @@ Warning : Need to be run as root in order to ping a domain, due to the socket us
 * Auto ping of every detected subdomains
 * Generate report for every subdomains
 * NMAP of every detected subdomains
+* Advanced scan with custom rules to detect IOV (indicator of vulnerability)
 
 **How to use it:** 
 ```

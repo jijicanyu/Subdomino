@@ -6,7 +6,7 @@ from subdomain_enum import *
 
 if __name__ == "__main__":
 	# Banner and version
-	print "Subdomino - v 0.1, by Swissky"
+	print "\033[1mSubdomino - v0.1, by Swissky\033[0m"
 
 	# Parsing arguments
 	parser = argparse.ArgumentParser()
@@ -19,6 +19,14 @@ if __name__ == "__main__":
 	if results.domain == None:
 		parser.print_help()
 		exit(-1)
+
+
+	# DEBUG
+	test = ['https://forum.zenk-security.com','http://www.domxss.com/domxss/01_Basics/06_jquery_old_html.html?1957630659', 'https://m.uber.com']
+	interpreter = Interpreter(test)
+	interpreter.launch_scans()
+	exit()
+	#/DEBUG
 
 	# Start a subdomain enumeration
 	init_enumeration(results.nmap)
