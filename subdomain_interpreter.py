@@ -25,6 +25,12 @@ class Interpreter():
 					self.rules.append(l.strip('\n').strip('rule: '))
 
 		
+	# Save IOV in the subdomains file
+	def report_IOV(self, name, subdomain, iov):
+		path = "reports/"+subdomain.replace('://','_')
+		with open(path, 'a+') as f:
+			f.write('IOV '+ iov + ' - ' + name)
+
 
 	# Engine which will parse every rules
 	def rule_engine(self, r, subdomain):
@@ -40,14 +46,17 @@ class Interpreter():
 				regex = regex.findall(part)
 				if( regex != []):		
 					if regex[0] in r.text:			
-						print "IOV 'is_string_page' found : "+ name + " for " + subdomain
+						print "\tIOV 'is_string_page' found : "+ name + " for " + subdomain
+						self.report_IOV(name, subdomain, "is_string_page")
+
 
 				# is_string_header()
 				regex = re.compile('is_string_header\("(.*?)"\)')			
 				regex = regex.findall(part)
 				if( regex != []):
 					if regex[0] in str(r.headers):
-						print "IOV 'is_string_header' found : "+ name + " for " + subdomain
+						print "\tIOV 'is_string_header' found : "+ name + " for " + subdomain
+						self.report_IOV(name, subdomain, "is_string_header")
 
 				# regex_match_page()
 				regex = re.compile('regex_match_page\("(.*?)"\)')			
@@ -56,7 +65,8 @@ class Interpreter():
 					regex_rule = re.compile(regex[0])
 					regex_rule = regex_rule.findall(r.text)
 					if (regex_rule != []):
-						print "IOV 'regex_match_page' found : "+ name + " for " + subdomain
+						print "\tIOV 'regex_match_page' found : "+ name + " for " + subdomain
+						self.report_IOV(name, subdomain, "regex_match_page")
 
 				# regex_match_header()
 				regex = re.compile('regex_match_header\("(.*?)"\)')			
@@ -65,7 +75,8 @@ class Interpreter():
 					regex_rule = re.compile(regex[0])
 					regex_rule = regex_rule.findall(str(r.headers))
 					if (regex_rule != []):
-						print "IOV 'regex_match_header' found : "+ name + " for " + subdomain
+						print "\tIOV 'regex_match_header' found : "+ name + " for " + subdomain
+						self.report_IOV(name, subdomain, "regex_match_header")
 
 				
 
