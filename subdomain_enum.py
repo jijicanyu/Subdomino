@@ -10,6 +10,7 @@ import signal
 import multiprocessing
 from ping import *
 from subdomain_scan import *
+from subdomain_interpreter import *
 
 # Initialize the global variable
 def init_enumeration(is_nmap):
@@ -40,7 +41,7 @@ def brute_with_file(domain):
 		dict_file = dict_file.readlines()
 		
 		# Determine online subdomain
-		for index,subdmn in enumerate(dict_file):
+		for subdmn in (dict_file):
 			clean_url = "http://"+subdmn.strip()+"."+domain
 			if not clean_url in online_subdmn and scan_subdomain(clean_url):
 				online_subdmn.append(clean_url)
@@ -107,14 +108,21 @@ def crawl_google_for_subdomain(is_google,domain):
 def generate_reports():
 	global online_subdmn
 	print "\n[+] Generating subdomain's report"
-	
-	if not os.path.exists('reports'):
-		os.mkdir('reports', 0755)
 
+	# Create the directory
+	if not os.path.exists('reports'):
+		os.makedirs('reports')
+
+	# Save subdomain's list
+	with open('reports/subdomains.lst','w+') as f:
+		f.write("\n".join(online_subdmn))
+	print "\n[+] Exported in subdomain.lst"
+
+	# One report for every subdomains
 	for subdmn in online_subdmn:
 		path = "reports/"+subdmn.replace('://','_')
 		if not os.path.exists(path):
-			os.mknod(path)
+			open(path,'w+')
 
 # Last function save everything
 def enf_of_software():
@@ -123,17 +131,15 @@ def enf_of_software():
 	online_subdmn = sorted(online_subdmn)
 	print "\n[+] Subdomains founds : ",online_subdmn
 
-	# Save subdomain's list
-	with open('subdomains.lst','w+') as f:
-		f.write("\n".join(online_subdmn))
-	print "\n[+] Exported in subdomain.lst"
-
-
 	# Start a report for every subdomain
 	generate_reports()
 
 	# Launch NMAP if necessary
 	nmap_subdomains(online_subdmn, nmap)
+
+	# Rule Interpreter
+	interpreter = Interpreter(online_subdmn)
+	interpreter.launch_scans()
 
 	# Exit the soft
 	exit(0)
