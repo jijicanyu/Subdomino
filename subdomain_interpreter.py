@@ -58,6 +58,15 @@ class Interpreter():
 					if (regex_rule != []):
 						print "IOV 'regex_match_page' found : "+ name + " for " + subdomain
 
+				# regex_match_header()
+				regex = re.compile('regex_match_header\("(.*?)"\)')			
+				regex = regex.findall(part)
+				if( regex != []):
+					regex_rule = re.compile(regex[0])
+					regex_rule = regex_rule.findall(str(r.headers))
+					if (regex_rule != []):
+						print "IOV 'regex_match_header' found : "+ name + " for " + subdomain
+
 				
 
 

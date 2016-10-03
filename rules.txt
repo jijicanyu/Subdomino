@@ -1,7 +1,11 @@
+name: Detection of Microsoft-IIS
+rule: _regex_match_header("Microsoft\-IIS\/[0-7].0")
+desc: Basic Microsoft Server IIS detection 
+
 name: Dom XSS Sink in JQuery
-rule: is_string_page("hash") AND regex_match_page("jquery.*?(1).([0-7]).([0-9]+)")
+rule: _is_string_page("hash") AND regex_match_page("jquery.*?(1).([0-7]).([0-9]+)")
 desc: Scan for potential DOM XSS Sink in JQuery < 1.6.9
 
 name: Open URL Redirection in Express
-rule: is_string_header("Express")
+rule: _is_string_header("Express")
 desc: Scan for potential Open URL Redirection in Node JS Express with domain//google.com
