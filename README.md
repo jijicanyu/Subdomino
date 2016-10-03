@@ -8,7 +8,7 @@ Warning : Need to be run as root in order to ping a domain, due to the socket us
 * Ping-v0.2 - pip install ping
 * Argparse  - pip install argparse
 
-## Description and How To
+## Description and How to
 **Features:** 
 * Bruteforce subdomains with file 'names.txt'
 * Detect subdomains using dork in Google
@@ -16,5 +16,7 @@ Warning : Need to be run as root in order to ping a domain, due to the socket us
 * Generate report for every subdomains
 * NMAP of every detected subdomains
 
-**How To:** 
-sudo python Subdomino.py --domain google.com (--nmap)
+**How to use it:** 
+```
+sudo python Subdomino.py --domain google.com (--nmap) (--google)
+```
