@@ -17,7 +17,21 @@ Warning : Need to be run as root in order to ping a domain, due to the socket us
 * NMAP of every detected subdomains
 * Advanced scan with custom rules to detect IOV (indicator of vulnerability)
 
-**How to use it:** 
+**How to use to enumerate online subdomains, and launch detection rule-based:** 
 ```
 sudo python Subdomino.py --domain google.com (--nmap) (--google)
 ```
+
+**How to add new rules**
+You need to add an entry in "rules.txt" like this
+```
+name: Name of the rule
+rule: Put here the rule you want to match
+desc: Description of the rule
+```
+
+You can use the following rules pattern:
+* is_string_page
+* is_string_header
+* regex_match_page
+* regex_match_header

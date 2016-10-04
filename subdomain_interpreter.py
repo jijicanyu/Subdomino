@@ -20,9 +20,9 @@ class Interpreter():
 			lines = f.readlines()
 			for l in lines:
 				if l[0:6] == "name: ":
-					self.names.append(l.strip('\n').strip('name: '))
+					self.names.append(l.strip('\n').replace('name: ',''))
 				if l[0:6] == "rule: ":
-					self.rules.append(l.strip('\n').strip('rule: '))
+					self.rules.append(l.strip('\n').replace('rule: ',''))
 
 		
 	# Save IOV in the subdomains file
