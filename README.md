@@ -8,8 +8,8 @@ Warning : Need to be run as root in order to ping a domain, due to the socket us
 * Ping-v0.2 - pip install ping
 * Argparse  - pip install argparse
 
-## Description and How to
-**Features:** 
+
+### Features:
 * Bruteforce subdomains with file 'names.txt'
 * Detect subdomains using dork in Google
 * Auto ping of every detected subdomains
@@ -17,13 +17,13 @@ Warning : Need to be run as root in order to ping a domain, due to the socket us
 * NMAP of every detected subdomains
 * Advanced scan with custom rules to detect IOV (indicator of vulnerability)
 
-**How to use to enumerate online subdomains, and launch detection rule-based:** 
+### How to use to enumerate online subdomains, and launch detection rule-based:** 
 ```
 sudo python Subdomino.py --domain google.com (--nmap) (--google)
 ```
 
-**How to add new rules**
-You need to add an entry in "rules.txt" like this
+### How to add new rules
+You need to add an entry in **"rules.txt"** like this
 ```
 name: Name of the rule
 rule: Put here the rule you want to match
