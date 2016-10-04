@@ -32,8 +32,52 @@ class Interpreter():
 			f.write('IOV '+ iov + ' - ' + name)
 
 
+	"""	<Start Of Rules> """
+	# Rule: is_string_page()
+	def rule_is_string_page(self,r,part):
+		regex = re.compile('is_string_page\("(.*?)"\)')		
+		regex = regex.findall(part)
+		if( regex != []):		
+			if regex[0] in r.text:		
+				return 1
+		return 0	
+
+	# Rule: is_string_header()
+	def rule_is_string_header(self,r,part):
+		regex = re.compile('is_string_header\("(.*?)"\)')			
+		regex = regex.findall(part)
+		if( regex != []):
+			if regex[0] in str(r.headers):
+				return 1
+		return 0
+
+	# Rule: regex_match_page()
+	def rule_regex_match_page(self,r,part):
+		regex = re.compile('regex_match_page\("(.*?)"\)')			
+		regex = regex.findall(part)
+		if( regex != []):
+			regex_rule = re.compile(regex[0])
+			regex_rule = regex_rule.findall(r.text)
+			if (regex_rule != []):
+				return 1
+		return 0
+
+	# Rule: regex_match_page()
+	def rule_regex_match_header(self,r,part):
+		regex = re.compile('regex_match_header\("(.*?)"\)')			
+		regex = regex.findall(part)
+		if( regex != []):
+			regex_rule = re.compile(regex[0])
+			regex_rule = regex_rule.findall(str(r.headers))
+			if (regex_rule != []):
+				return 1
+		return 0
+	
+	""" </Enf Of Rules> """
+
+
 	# Engine which will parse every rules
-	def rule_engine(self, r, subdomain):
+	def rules_engine(self, r, subdomain):
 
 		# Go thru every rule in ['rule1', 'rule2']	['name1','name2']
 		for rule,name in zip(self.rules, self.names):
@@ -42,47 +86,29 @@ class Interpreter():
 			for part in rule.split(' '):
 
 				# is_string_page()
-				regex = re.compile('is_string_page\("(.*?)"\)')		
-				regex = regex.findall(part)
-				if( regex != []):		
-					if regex[0] in r.text:			
-						print "\tIOV 'is_string_page' found : "+ name + " for " + subdomain
-						self.report_IOV(name, subdomain, "is_string_page")
-
+				if self.rule_is_string_page(r,part):
+					print "\tIOV 'is_string_page' found : "+ name + " for " + subdomain
+					#self.report_IOV(name, subdomain, "is_string_page")
 
 				# is_string_header()
-				regex = re.compile('is_string_header\("(.*?)"\)')			
-				regex = regex.findall(part)
-				if( regex != []):
-					if regex[0] in str(r.headers):
-						print "\tIOV 'is_string_header' found : "+ name + " for " + subdomain
-						self.report_IOV(name, subdomain, "is_string_header")
+				if self.rule_is_string_header(r,part):
+					print "\tIOV 'is_string_header' found : "+ name + " for " + subdomain
+					#self.report_IOV(name, subdomain, "is_string_header")
 
 				# regex_match_page()
-				regex = re.compile('regex_match_page\("(.*?)"\)')			
-				regex = regex.findall(part)
-				if( regex != []):
-					regex_rule = re.compile(regex[0])
-					regex_rule = regex_rule.findall(r.text)
-					if (regex_rule != []):
-						print "\tIOV 'regex_match_page' found : "+ name + " for " + subdomain
-						self.report_IOV(name, subdomain, "regex_match_page")
+				if self.rule_regex_match_page(r,part):
+					print "\tIOV 'regex_match_page' found : "+ name + " for " + subdomain
+					#self.report_IOV(name, subdomain, "regex_match_page")
 
 				# regex_match_header()
-				regex = re.compile('regex_match_header\("(.*?)"\)')			
-				regex = regex.findall(part)
-				if( regex != []):
-					regex_rule = re.compile(regex[0])
-					regex_rule = regex_rule.findall(str(r.headers))
-					if (regex_rule != []):
-						print "\tIOV 'regex_match_header' found : "+ name + " for " + subdomain
-						self.report_IOV(name, subdomain, "regex_match_header")
+				if self.rule_regex_match_header(r,part):
+					print "\tIOV 'regex_match_header' found : "+ name + " for " + subdomain
+					#self.report_IOV(name, subdomain, "regex_match_header")
 
-				
 
 
 	# Start a scan with the rules for every subdomains
 	def launch_scans(self):
 		for subdomain in  self.subdomains:
 			r = requests.get(subdomain)
-			self.rule_engine(r, subdomain)
+			self.rules_engine(r, subdomain)
