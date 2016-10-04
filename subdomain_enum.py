@@ -118,11 +118,13 @@ def generate_reports():
 		f.write("\n".join(online_subdmn))
 	print "\n[+] Exported in subdomain.lst"
 
-	# One report for every subdomains
-	for subdmn in online_subdmn:
-		path = "reports/"+subdmn.replace('://','_')
-		if not os.path.exists(path):
-			open(path,'w+')
+	# One report for every subdomains - if nmap option enabled
+	global nmap
+	if nmap == True:
+		for subdmn in online_subdmn:
+			path = "reports/"+subdmn.replace('://','_')
+			if not os.path.exists(path):
+				open(path,'w+')
 
 # Last function save everything
 def enf_of_software():

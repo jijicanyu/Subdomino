@@ -20,14 +20,6 @@ if __name__ == "__main__":
 		parser.print_help()
 		exit(-1)
 
-	# DEBUG
-	test = ['http://www.domxss.com/domxss/01_Basics/06_jquery_old_html.html?1957630659']
-	interpreter = Interpreter(test)
-	interpreter.launch_scans()
-	exit()
-	#/DEBUG
-
-
 	# Start a subdomain enumeration
 	init_enumeration(results.nmap)
 

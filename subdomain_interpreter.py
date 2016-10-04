@@ -27,6 +27,7 @@ class Interpreter():
 		
 	# Save IOV in the subdomains file
 	def report_IOV(self, name, subdomain, iov):
+		print "\t\033[1mIOV '" + iov + "' found : \033[0m"+ name + " for " + subdomain
 		path = "reports/"+subdomain.replace('://','_')
 		with open(path, 'a+') as f:
 			f.write('IOV '+ iov + ' - ' + name)
@@ -77,38 +78,59 @@ class Interpreter():
 
 
 	# Engine which will parse every rules
+	"""
+	Note: to add a new rule interpretation, you need to :
+	- do a function called rule_nameofinterpretation(self,r,part)
+	- add the 'if self.rule_nameofinterpretation(r,part):' in the following code
+	- add the 'and_result += self.rule_nameofinterpretation(r,part)'
+	"""
 	def rules_engine(self, r, subdomain):
 
 		# Go thru every rule in ['rule1', 'rule2']	['name1','name2']
 		for rule,name in zip(self.rules, self.names):
 
-			# Split the rule in several part ['A B C'] -> A,B,C
-			for part in rule.split(' '):
+			# Handling AND Operator
+			if "AND" in rule:
+				# Strip space and split by AND to have an array of rules
+				and_list   = rule.replace(' ','').split('AND')
+				and_result = 0
 
-				# is_string_page()
-				if self.rule_is_string_page(r,part):
-					print "\tIOV 'is_string_page' found : "+ name + " for " + subdomain
-					#self.report_IOV(name, subdomain, "is_string_page")
+				# Split the rule in several part ['A B C'] -> A,B,C
+				for part in and_list:
+					and_result += self.rule_is_string_page(r,part)
+					and_result += self.rule_is_string_header(r,part)
+					and_result += self.rule_regex_match_page(r,part)
+					and_result += self.rule_regex_match_header(r,part)
 
-				# is_string_header()
-				if self.rule_is_string_header(r,part):
-					print "\tIOV 'is_string_header' found : "+ name + " for " + subdomain
-					#self.report_IOV(name, subdomain, "is_string_header")
+				# Compare the number of rules and the number of matched rule
+				if and_result == len(and_list):
+					self.report_IOV(name, subdomain, "multiple rules")
+			else:
 
-				# regex_match_page()
-				if self.rule_regex_match_page(r,part):
-					print "\tIOV 'regex_match_page' found : "+ name + " for " + subdomain
-					#self.report_IOV(name, subdomain, "regex_match_page")
+				# Split the rule in several part ['A B C'] -> A,B,C
+				for part in rule.split(' '):
 
-				# regex_match_header()
-				if self.rule_regex_match_header(r,part):
-					print "\tIOV 'regex_match_header' found : "+ name + " for " + subdomain
-					#self.report_IOV(name, subdomain, "regex_match_header")
+					# is_string_page()
+					if self.rule_is_string_page(r,part):
+						self.report_IOV(name, subdomain, "is_string_page")
+
+					# is_string_header()
+					if self.rule_is_string_header(r,part):
+						self.report_IOV(name, subdomain, "is_string_header")
+
+					# regex_match_page()
+					if self.rule_regex_match_page(r,part):
+						self.report_IOV(name, subdomain, "regex_match_page")
+
+					# regex_match_header()
+					if self.rule_regex_match_header(r,part):
+						self.report_IOV(name, subdomain, "regex_match_header")
 
 
 
 	# Start a scan with the rules for every subdomains
 	def launch_scans(self):
+		print "\n[+] Scan subdomains using the rules Interpreter"
 		for subdomain in  self.subdomains:
 			r = requests.get(subdomain)
 			self.rules_engine(r, subdomain)
