@@ -160,7 +160,7 @@ def end_of_software():
 	online_subdmn = filter(None, online_subdmn)
 	online_subdmn = sorted(online_subdmn)
 	print "\n[+] Subdomains founds : ",online_subdmn
-	exit()
+
 	# Start a report for every subdomain
 	generate_reports()
 
