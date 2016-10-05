@@ -117,7 +117,7 @@ class Interpreter():
 					# is_string_header()
 					if self.rule_is_string_header(r,part):
 						self.report_IOV(name, subdomain, "is_string_header")
-
+						
 					# regex_match_page()
 					if self.rule_regex_match_page(r,part):
 						self.report_IOV(name, subdomain, "regex_match_page")
@@ -136,4 +136,5 @@ class Interpreter():
 				r = requests.get(subdomain)
 				self.rules_engine(r, subdomain)
 			except Exception, e:
+				print e
 				pass

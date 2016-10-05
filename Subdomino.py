@@ -14,7 +14,7 @@ if __name__ == "__main__":
 	parser.add_argument('--nmap',   action ='store_true', dest='nmap',   help="Boolean Nmap",   default=False)
 	parser.add_argument('--google', action ='store_true', dest='google', help="Boolean Google", default=False)
 	results = parser.parse_args()
-	
+
 	# Need a domain to start enumerating
 	if results.domain == None:
 		parser.print_help()

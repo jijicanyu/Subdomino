@@ -1,11 +1,23 @@
 name: Apache version displayed
-rule: is_string_header("Apache")
-desc: This is a test
+rule: regex_match_header("Apache\/(\d+)\.(\d+)\.(\d+)")
+desc: Scan for Apache version displayed in the header
 
 name: Dom XSS Sink in JQuery
-rule: is_string_page("hash") AND regex_match_page("jquery.*?(1).([0-7]).([0-9]+)")
-desc: Scan for potential DOM XSS Sink in JQuery < 1.7.9
+rule: is_string_page("hash") AND regex_match_page("jquery.*?(1).([0-6]).([0-9]+)")
+desc: Scan for potential DOM XSS Sink in JQuery < 1.6.9
 
 name: Open URL Redirection in Express
 rule: is_string_header("Express")
 desc: Scan for potential Open URL Redirection in Node JS Express with domain//google.com
+
+name: DOM XSS Source Indicator
+rule: regex_match_page("/(location\s*[\[.])|([.\[]\s*["']?\s*(arguments|dialogArguments|innerHTML|write(ln)?|open(Dialog)?|showModalDialog|cookie|URL|documentURI|baseURI|referrer|name|opener|parent|top|content|self|frames)\W)|(localStorage|sessionStorage|Database)/")
+desc: Scan for DOM XSS Sink, from https://github.com/wisec/domxsswiki/wiki/Finding-DOMXSS
+
+name: DOM XSS Sink Indicator v1
+rule: regex_match_page("/((src|href|data|location|code|value|action)\s*["'\]]*\s*\+?\s*=)|((replace|assign|navigate|getResponseHeader|open(Dialog)?|showModalDialog|eval|evaluate|execCommand|execScript|setTimeout|setInterval)\s*["'\]]*\s*\()/")
+desc: Scan for DOM XSS Sink, from https://github.com/wisec/domxsswiki/wiki/Finding-DOMXSS
+
+name: DOM XSS Sink Indicator v2
+rule: regex_match_page("/after\(|\.append\(|\.before\(|\.html\(|\.prepend\(|\.replaceWith\(|\.wrap\(|\.wrapAll\(|\$\(|\.globalEval\(|\.add\(|jQUery\(|\$\(|\.parseHTML\(/")
+desc: Scan for DOM XSS Sink, from https://github.com/wisec/domxsswiki/wiki/Finding-DOMXSS

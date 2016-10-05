@@ -34,9 +34,6 @@ def init_enumeration(is_nmap):
 def signal_handler(signal, frame):
 	end_of_software()
 
-
-
-
 # Multiprocessing exit
 def init_worker():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -62,7 +59,6 @@ def brute_with_file(domain):
 			for subdmn in dict_file:
 				pool.apply_async(multiprocessing_ping_scan, args=("http://"+subdmn.strip()+"."+domain, ), callback=online_subdmn.append)
 			
-			time.sleep(5)
 			pool.close()
 			pool.join()
 
