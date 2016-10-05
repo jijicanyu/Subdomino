@@ -23,8 +23,7 @@ def scan_subdomain(dest_addr, timeout = 1, count = 1, psize = 64):
         try:
             delay = do_one(dest_addr, timeout, psize)
         except socket.gaierror, e:
-            # Do not show failed host
-            break
+            return False
 
         if delay != None:
             delay = delay * 1000

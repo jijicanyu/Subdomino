@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import time
 import re
 import os
 import sys
@@ -11,6 +12,7 @@ import multiprocessing
 from ping import *
 from subdomain_scan import *
 from subdomain_interpreter import *
+from multiprocessing import Process, Pool
 
 # Initialize the global variable
 def init_enumeration(is_nmap):
@@ -27,24 +29,48 @@ def init_enumeration(is_nmap):
 		print "[OPTION] Nmap Scan disabled"
 	nmap = is_nmap
 
+
 # CTRL+C Handler
 def signal_handler(signal, frame):
-	enf_of_software()
+	end_of_software()
+
+
+
+
+# Multiprocessing exit
+def init_worker():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+# Multiprocessing ping scan
+def multiprocessing_ping_scan(x):
+	if scan_subdomain(x):
+		return x
+	else:
+		return None
 
 # Generate a list of potential subdomain
 def brute_with_file(domain):
 	print "\n[+] Brute subdomain from names.txt ..."
-	# This interruption will manage CTRL+C in different states
-	signal.signal(signal.SIGINT, signal_handler)
 
+	# Subdomain extensions are stored in names.txt
 	with open('names.txt','r') as dict_file:
 		dict_file = dict_file.readlines()
-		
-		# Determine online subdomain
-		for subdmn in (dict_file):
-			clean_url = "http://"+subdmn.strip()+"."+domain
-			if not clean_url in online_subdmn and scan_subdomain(clean_url):
-				online_subdmn.append(clean_url)
+
+		# Multiprocessing of pinging subdmn
+		try:
+			pool = Pool(10, init_worker)
+			for subdmn in dict_file:
+				pool.apply_async(multiprocessing_ping_scan, args=("http://"+subdmn.strip()+"."+domain, ), callback=online_subdmn.append)
+			
+			time.sleep(5)
+			pool.close()
+			pool.join()
+
+		except KeyboardInterrupt:
+			print " Multiprocessing stopped!"
+			pool.terminate()
+			pool.join()
+
 
 # Function for the multiprocessing crawl
 def crawl_google_for_subdomain_extract(stuff_to_get):
@@ -111,7 +137,7 @@ def generate_reports():
 
 	# Create the directory
 	if not os.path.exists('reports'):
-		os.makedirs('reports')
+		os.mkdir('reports',0755)
 
 	# Save subdomain's list
 	with open('reports/subdomains.lst','w+') as f:
@@ -127,12 +153,14 @@ def generate_reports():
 				open(path,'w+')
 
 # Last function save everything
-def enf_of_software():
+def end_of_software():
+
 	# Sort the list for a clean output
 	global online_subdmn
+	online_subdmn = filter(None, online_subdmn)
 	online_subdmn = sorted(online_subdmn)
 	print "\n[+] Subdomains founds : ",online_subdmn
-
+	exit()
 	# Start a report for every subdomain
 	generate_reports()
 

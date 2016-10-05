@@ -132,5 +132,8 @@ class Interpreter():
 	def launch_scans(self):
 		print "\n[+] Scan subdomains using the rules Interpreter"
 		for subdomain in  self.subdomains:
-			r = requests.get(subdomain)
-			self.rules_engine(r, subdomain)
+			try:
+				r = requests.get(subdomain)
+				self.rules_engine(r, subdomain)
+			except Exception, e:
+				pass
