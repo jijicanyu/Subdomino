@@ -413,7 +413,6 @@ ticket
 js
 ns9
 outlook
-MAIL
 foto
 pro
 mantis

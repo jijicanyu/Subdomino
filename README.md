@@ -38,7 +38,7 @@ You can use the following rules pattern:
 * regex_match_page
 * regex_match_header
 
-You can also chain several rules with AND operator like this
+You can also chain several rules with **AND** operator like this
 ```
 rule: is_string_page("hash") AND regex_match_page("jquery.*?(1).([0-7]).([0-9]+)")
 ```

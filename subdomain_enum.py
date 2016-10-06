@@ -48,7 +48,7 @@ def brute_with_file(domain):
 	# Subdomain extensions are stored in names.txt
 	with open('names.txt','r') as dict_file:
 		dict_file = dict_file.readlines()
-		pool = Pool(10)
+		pool = Pool(20)
 
 		# Multiprocessing
 		for subdmn in dict_file:
@@ -57,6 +57,10 @@ def brute_with_file(domain):
     	# We need this to stop it with Ctrl+C
 		try:
 			time.sleep(10)
+			pool.close()
+			pool.join()
+
+
 		except KeyboardInterrupt:
 			print " Multiprocessing stopped!"
 			pool.terminate()
