@@ -29,44 +29,38 @@ def init_enumeration(is_nmap):
 		print "[OPTION] Nmap Scan disabled"
 	nmap = is_nmap
 
-
-# CTRL+C Handler
-def signal_handler(signal, frame):
-	end_of_software()
-
-# Multiprocessing exit
-def init_worker():
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-
 # Multiprocessing ping scan
 def multiprocessing_ping_scan(x):
-	if scan_subdomain(x):
-		return x
-	else:
+	try:
+		if scan_subdomain(x):
+			return x
+		else:
+			return None
+
+	except KeyboardInterrupt,e:
 		return None
 
 # Generate a list of potential subdomain
 def brute_with_file(domain):
 	print "\n[+] Brute subdomain from names.txt ..."
+	global online_subdmn
 
 	# Subdomain extensions are stored in names.txt
 	with open('names.txt','r') as dict_file:
 		dict_file = dict_file.readlines()
+		pool = Pool(10)
 
-		# Multiprocessing of pinging subdmn
+		# Multiprocessing
+		for subdmn in dict_file:
+			pool.apply_async(multiprocessing_ping_scan, ("http://"+subdmn.strip()+"."+domain,), callback=online_subdmn.append)
+    	
+    	# We need this to stop it with Ctrl+C
 		try:
-			pool = Pool(10, init_worker)
-			for subdmn in dict_file:
-				pool.apply_async(multiprocessing_ping_scan, args=("http://"+subdmn.strip()+"."+domain, ), callback=online_subdmn.append)
-			
-			pool.close()
-			pool.join()
-
+			time.sleep(10)
 		except KeyboardInterrupt:
 			print " Multiprocessing stopped!"
 			pool.terminate()
 			pool.join()
-
 
 # Function for the multiprocessing crawl
 def crawl_google_for_subdomain_extract(stuff_to_get):

@@ -39,7 +39,7 @@ def scan_subdomain(dest_addr, timeout = 1, count = 1, psize = 64):
 
 
 	if( percent_lost  == 0 ):
-		print "\033[92mUP - \033[0m" + dest_addr
+		print "\r\033[92mUP - \033[0m" + dest_addr
 		return True
 	else:
 		# Do not show failed host
