@@ -42,12 +42,12 @@ def multiprocessing_ping_scan(host,n_iter,n_max):
 		return None
 
 # Generate a list of potential subdomain
-def brute_with_file(domain, process):
+def brute_with_file(names_file,domain, process):
 	print "\n[+] Brute subdomain from names.txt ..."
 	global online_subdmn
 
 	# Subdomain extensions are stored in names.txt
-	with open('names.txt','r') as dict_file:
+	with open(names_file,'r') as dict_file:
 		dict_file = dict_file.readlines()
 		pool = Pool(process)
 
@@ -150,22 +150,26 @@ def generate_reports():
 
 # Last function save everything
 def end_of_software():
-	
-	# Sort the list for a clean output
-	global online_subdmn
-	online_subdmn = filter(None, online_subdmn)
-	online_subdmn = sorted(online_subdmn)
-	print "\n[+] Subdomains founds : ",online_subdmn
+	try:
+		# Sort the list for a clean output
+		global online_subdmn
+		online_subdmn = filter(None, online_subdmn)
+		online_subdmn = sorted(online_subdmn)
+		print "\n[+] Subdomains founds : ",online_subdmn
 
-	# Start a report for every subdomain
-	generate_reports()
+		# Start a report for every subdomain
+		generate_reports()
 
-	# Launch NMAP if necessary
-	nmap_subdomains(online_subdmn, nmap)
+		# Launch NMAP if necessary
+		nmap_subdomains(online_subdmn, nmap)
 
-	# Rule Interpreter
-	interpreter = Interpreter(online_subdmn)
-	interpreter.launch_scans()
+		# Rule Interpreter
+		interpreter = Interpreter(online_subdmn)
+		interpreter.launch_scans()
 
-	# Exit the soft
-	exit(0)
+		# Exit the soft
+		exit(0)
+
+	except KeyboardInterrupt:
+		print "Happy Hunting ! :)"
+		exit()

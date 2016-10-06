@@ -31,18 +31,10 @@ def scan_subdomain(dest_addr, timeout = 1, count = 1, psize = 64):
 
     # Find lost package percent
     percent_lost = 100 - (len(plist) * 100 / count)
-
-    # Find max and avg round trip time
-    if plist:
-        mrtt = max(plist)
-        artt = sum(plist) / len(plist)
-
-
-	if( percent_lost  == 0 ):
-		return True
-	else:
-		# Do not show failed host
-		return False
+    if( percent_lost  == 0 ):
+        return True
+    else:
+        return False
 
 # Start a nmap for every subdomains and store the result
 def nmap_subdomains(online_subdmn,nmap):

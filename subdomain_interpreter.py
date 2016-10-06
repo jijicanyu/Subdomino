@@ -136,5 +136,4 @@ class Interpreter():
 				r = requests.get(subdomain, timeout=5)
 				self.rules_engine(r, subdomain)
 			except Exception, e:
-				print e
 				pass
