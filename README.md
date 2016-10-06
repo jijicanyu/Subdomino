@@ -10,7 +10,7 @@ Warning : Need to be run as root in order to ping a domain, due to the socket us
 
 
 ## Features
-* Bruteforce subdomains with file 'names.txt'
+* Bruteforce subdomains with file 'names.txt' or custom
 * Detect subdomains using dork in Google
 * Auto ping of every detected subdomains
 * Generate report for every subdomains
@@ -20,8 +20,13 @@ Warning : Need to be run as root in order to ping a domain, due to the socket us
 
 ### How to use to enumerate online subdomains, and launch detection rule-based
 ```
-sudo python Subdomino.py --domain google.com (--nmap) (--google)
+sudo python Subdomino.py --domain google.com (--nmap) (--google) (--names big_names.txt) (--threads 20)
 ```
+The options are:
+* nmap   : launch a fast nmap on every discovered subdomains
+* google : search for subdomain using google dork
+* names  : allow you to use a custom file to bruteforce subdomains
+* threads: number of pools you want to use for the multiprocessing bruteforce
 
 
 ### How to add new rules

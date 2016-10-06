@@ -43,7 +43,7 @@ def multiprocessing_ping_scan(host,n_iter,n_max):
 
 # Generate a list of potential subdomain
 def brute_with_file(names_file,domain, process):
-	print "\n[+] Brute subdomain from names.txt ..."
+	print "\n[+] Brute subdomain from {} with {} pools...".format(names_file, process)
 	global online_subdmn
 
 	# Subdomain extensions are stored in names.txt
