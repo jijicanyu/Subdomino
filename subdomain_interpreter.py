@@ -133,7 +133,7 @@ class Interpreter():
 		print "\n[+] Scan subdomains using the rules Interpreter"
 		for subdomain in  self.subdomains:
 			try:
-				r = requests.get(subdomain)
+				r = requests.get(subdomain, timeout=5)
 				self.rules_engine(r, subdomain)
 			except Exception, e:
 				print e

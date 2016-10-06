@@ -30,10 +30,11 @@ def init_enumeration(is_nmap):
 	nmap = is_nmap
 
 # Multiprocessing ping scan
-def multiprocessing_ping_scan(x):
+def multiprocessing_ping_scan(host,n_iter,n_max):
 	try:
-		if scan_subdomain(x):
-			return x
+		if scan_subdomain(host):
+			print "n° {:>4}/{} - \033[92mUP - \033[0m{}".format(n_iter, n_max, host)
+			return host
 		else:
 			return None
 
@@ -41,18 +42,19 @@ def multiprocessing_ping_scan(x):
 		return None
 
 # Generate a list of potential subdomain
-def brute_with_file(domain):
+def brute_with_file(domain, process):
 	print "\n[+] Brute subdomain from names.txt ..."
 	global online_subdmn
 
 	# Subdomain extensions are stored in names.txt
 	with open('names.txt','r') as dict_file:
 		dict_file = dict_file.readlines()
-		pool = Pool(20)
+		pool = Pool(process)
 
 		# Multiprocessing
-		for subdmn in dict_file:
-			pool.apply_async(multiprocessing_ping_scan, ("http://"+subdmn.strip()+"."+domain,), callback=online_subdmn.append)
+		max_subdmn = len(dict_file)
+		for index,subdmn in enumerate(dict_file):
+			pool.apply_async(multiprocessing_ping_scan, ("http://"+subdmn.strip()+"."+domain, index, max_subdmn), callback=online_subdmn.append)
     	
     	# We need this to stop it with Ctrl+C
 		try:
@@ -148,7 +150,7 @@ def generate_reports():
 
 # Last function save everything
 def end_of_software():
-
+	
 	# Sort the list for a clean output
 	global online_subdmn
 	online_subdmn = filter(None, online_subdmn)

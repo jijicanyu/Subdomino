@@ -27,7 +27,7 @@ if __name__ == "__main__":
 	crawl_google_for_subdomain(results.google,results.domain) 
 	
 	# Basic Function
-	brute_with_file(results.domain)
+	brute_with_file(results.domain, 20)
 
 	# Save everything and end the script
 	end_of_software()
