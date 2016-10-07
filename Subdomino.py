@@ -26,7 +26,7 @@ if __name__ == "__main__":
 	init_enumeration(results.nmap)
 
 	# Option Google
-	crawl_google_for_subdomain(results.google,results.domain) 
+	crawl_google_for_subdomain(results.google,results.domain, int(results.threads)) 
 	
 	# Basic Function
 	brute_with_file(results.names, results.domain, int(results.threads))

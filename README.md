@@ -1,5 +1,6 @@
 # Subdomino
 ![Image of Subdomino](http://image.noelshack.com/fichiers/2016/39/1475404267-capture-d-ecran-de-2016-10-02-17-28-57.png)
+An application that enumerates subdomains, and scan them with different rules
 ```
 Warning : Need to be run as root in order to ping a domain, due to the socket use !
 ```
@@ -18,7 +19,7 @@ Warning : Need to be run as root in order to ping a domain, due to the socket us
 * Advanced scan with custom rules to detect IOV (indicator of vulnerability)
 
 
-### How to use to enumerate online subdomains, and launch detection rule-based
+## How to use to enumerate online subdomains, and launch detection rule-based
 ```
 sudo python Subdomino.py --domain google.com (--nmap) (--google) (--names big_names.txt) (--threads 20)
 ```
@@ -29,7 +30,7 @@ The options are:
 * threads: number of pools you want to use for the multiprocessing bruteforce
 
 
-### How to add new rules
+## How to add new rules
 You need to add an entry in **"rules.txt"** like this
 ```
 name: Name of the rule

@@ -49,6 +49,7 @@ def brute_with_file(names_file,domain, process):
 	# Subdomain extensions are stored in names.txt
 	with open(names_file,'r') as dict_file:
 		dict_file = dict_file.readlines()
+
 		pool = Pool(process)
 
 		# Multiprocessing
@@ -62,11 +63,11 @@ def brute_with_file(names_file,domain, process):
 			pool.close()
 			pool.join()
 
-
 		except KeyboardInterrupt:
 			print " Multiprocessing stopped!"
 			pool.terminate()
 			pool.join()
+
 
 # Function for the multiprocessing crawl
 def crawl_google_for_subdomain_extract(stuff_to_get):
@@ -74,12 +75,21 @@ def crawl_google_for_subdomain_extract(stuff_to_get):
   stuff_got = []
   
   for thing in stuff_to_get:
-    stuff_got.append( requests.get(google + thing).text )
+  	headers = {
+    	'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36 OPR/40.0.2308.52 (Edition beta)',
+    	'From': 'youremail@domain.com'  # This is another valid field	
+	}
+  	resp = requests.get(google + thing, headers=headers).text
+  	if 'Our systems have detected unusual traffic' in resp:
+  		print "Too many requests, Google blocked us :X"
+  		break
+  	else:
+  		stuff_got.append(resp.encode('utf-8'))
 
-  return stuff_got
+  return "".join(stuff_got)
 
 # Extract subdomain from google results
-def crawl_google_for_subdomain(is_google,domain):
+def crawl_google_for_subdomain(is_google,domain,process):
 	if (is_google):
 		print "[OPTION] Google Scan enabled"
 		print "\n[+] Crawl from Google..."
@@ -90,41 +100,42 @@ def crawl_google_for_subdomain(is_google,domain):
 		for i in range(0,10):
 			stuff_that_needs_getting.append(str(i*10))
 
+
 		# Set a google URL global for the multithread
 		global google
-		google = 'https://www.google.fr/search?&q=site:*.'+domain+"&start="
+		google = 'https://www.google.co.th/search?q=site:*.{} -www.{}&start='.format(domain,domain)
 
 		# Use multi threads
-		pool = multiprocessing.Pool(processes=2)
-		pool_outputs = pool.map(crawl_google_for_subdomain_extract, stuff_that_needs_getting)
+		pool = multiprocessing.Pool(process)
+		pool_outputs = pool.map(crawl_google_for_subdomain_extract, stuff_that_needs_getting) #function, arg(=list of hosts)
 		pool.close()
 		pool.join()
 
 		# Threads are done, now let parse theirs results
-		for google_source in pool_outputs:
-			websites = tuple(re.finditer(r'<cite>([^\'" <>]+)<\/cite>', google_source[0]))
+		google_source = "".join(pool_outputs)
+		regex = re.compile(r'<cite.*?>([^\'" <>]+)<\/cite>')
+		websites = regex.findall(google_source)
 
-			for website in websites:
-				clean_url = ""
-				
-				# Handle result like bla.domain
-				if(not "http" in website.group(1)):
-					clean_url = "http://" + website.group(1)
-					clean_url = '/'.join(clean_url.split('/',3)[:-1])
+		for website in websites:
+			clean_url = ""
+					
+			# Handle result like bla.domain
+			if(not "http" in website):
+				clean_url = "http://" + website
+				clean_url = '/'.join(clean_url.split('/',3)[:-1])
 
-				# Handle result like http://bla.domain
-				else:
-					clean_url = '/'.join(website.group(1).split('/',3)[:-1])
+			# Handle result like http://bla.domain
+			else:
+				clean_url = '/'.join(website.split('/',3)[:-1])
 
-				if(not clean_url in online_subdmn):
-					online_subdmn.append(clean_url)
-
-		# Sort the result for a clean output :)
-		online_subdmn = sorted(online_subdmn)
-		for subdmn in online_subdmn:
-			print "\033[92mFound - \033[0m" + subdmn
+			if(not clean_url in online_subdmn):
+				online_subdmn.append(clean_url)
+				print "\033[92mFound - \033[0m" + clean_url
+			
+		pool.terminate()
 	else:
 		print "[OPTION] Google Scan disabled"
+
 
 # Generating a report for every subdomain
 def generate_reports():
