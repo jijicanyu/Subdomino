@@ -75,11 +75,13 @@ def crawl_google_for_subdomain_extract(stuff_to_get):
   stuff_got = []
   
   for thing in stuff_to_get:
+  	# Use an User-Agent to avoid a ban from Google
   	headers = {
-    	'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36 OPR/40.0.2308.52 (Edition beta)',
-    	'From': 'youremail@domain.com'  # This is another valid field	
+    	'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36 OPR/40.0.2308.52 (Edition beta)'	
 	}
   	resp = requests.get(google + thing, headers=headers).text
+
+  	# Ban detection
   	if 'Our systems have detected unusual traffic' in resp:
   		print "Too many requests, Google blocked us :X"
   		break
@@ -97,9 +99,8 @@ def crawl_google_for_subdomain(is_google,domain,process):
 
 		# Define number of results
 		stuff_that_needs_getting = []
-		for i in range(0,10):
+		for i in range(0,is_google):
 			stuff_that_needs_getting.append(str(i*10))
-
 
 		# Set a google URL global for the multithread
 		global google

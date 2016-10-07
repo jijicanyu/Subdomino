@@ -11,10 +11,10 @@ if __name__ == "__main__":
 	# Parsing arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--domain', action ='store',      dest='domain',  help="Target domain")
-	parser.add_argument('--nmap',   action ='store_true', dest='nmap',    help="Boolean Nmap",     default=False)
-	parser.add_argument('--google', action ='store_true', dest='google',  help="Boolean Google",   default=False)
-	parser.add_argument('--names',  action ='store',      dest='names',   help="Names files",      default="names.txt")
-	parser.add_argument('--threads',action ='store',      dest='threads', help="Number of thread", default=20)
+	parser.add_argument('--nmap',   action ='store_true', dest='nmap',    help="Boolean Nmap",        default=False)
+	parser.add_argument('--google', action ='store',      dest='google',  help="N° of Google page",   default=False)
+	parser.add_argument('--names',  action ='store',      dest='names',   help="Names files",         default="names.txt")
+	parser.add_argument('--threads',action ='store',      dest='threads', help="Number of thread",    default=20)
 	results = parser.parse_args()
 
 	# Need a domain to start enumerating
@@ -26,7 +26,7 @@ if __name__ == "__main__":
 	init_enumeration(results.nmap)
 
 	# Option Google
-	crawl_google_for_subdomain(results.google,results.domain, int(results.threads)) 
+	crawl_google_for_subdomain(int(results.google),results.domain, int(results.threads)) 
 	
 	# Basic Function
 	brute_with_file(results.names, results.domain, int(results.threads))
