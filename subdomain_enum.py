@@ -88,18 +88,18 @@ def crawl_website_for_subdomain_extract(stuff_to_get):
 	return "".join(stuff_got)
 
 # Extract subdomain from google results
-def crawl_google_for_subdomain(is_google,domain,process):
-	if (is_google):
-		print "\n[OPTION] Google Scan enabled"
-		print "[+] Crawl from Google..."
+def crawl_website_for_subdomain(name,option_selected,domain,process,url,regex_opt):
+	if (option_selected):
+		print "\n[OPTION] {} Scan enabled".format(name)
+		print "[+] Crawl from {}...".format(name)
 		global online_subdmn
 		
 		# Set a google URL for the multithread
-		google = 'https://www.google.co.th/search?q=site:*.{} -www.{}&start='.format(domain,domain)
+		google = url.format(domain,domain)
 
 		# Define number of results
 		stuff_that_needs_getting = []
-		for i in range(0,is_google):
+		for i in range(0,option_selected):
 			stuff_that_needs_getting.append(google+str(i*10))
 
 		# Use multi threads
@@ -110,7 +110,7 @@ def crawl_google_for_subdomain(is_google,domain,process):
 
 		# Threads are done, now let parse theirs results
 		google_source = "".join(pool_outputs)
-		regex = re.compile(r'<cite.*?>([^\'" <>]+)<\/cite>')
+		regex = re.compile(regex_opt)
 		websites = regex.findall(google_source)
 
 		for website in websites:
@@ -131,100 +131,7 @@ def crawl_google_for_subdomain(is_google,domain,process):
 			
 		pool.terminate()
 	else:
-		print "[OPTION] Google Scan disabled"
-
-# Extract subdomain from yahoo results
-def crawl_yahoo_for_subdomain(is_yahoo,domain,process):
-	if (is_yahoo):
-		print "\n[OPTION] Yahoo Scan enabled"
-		print "[+] Crawl from Yahoo..."
-		global online_subdmn
-
-		# Set a google URL for the multithread
-		yahoo = 'https://search.yahoo.com/search?p=site%3A{}+-www.{}&b='.format(domain,domain)
-
-		# Define number of results
-		stuff_that_needs_getting = []
-		for i in range(0,is_yahoo):
-			stuff_that_needs_getting.append(yahoo+str(i*10))
-
-		# Use multi threads
-		pool = multiprocessing.Pool(process)
-		pool_outputs = pool.map(crawl_website_for_subdomain_extract, stuff_that_needs_getting) #function, arg(=list of hosts)
-		pool.close()
-		pool.join()
-
-		# Threads are done, now let parse theirs results
-		yahoo_source = "".join(pool_outputs)
-		regex = re.compile(r'href="(.*?'+domain+'.*?)" referrerpolicy="origin"')
-		websites = regex.findall(yahoo_source)
-
-		for website in websites:
-			clean_url = ""
-					
-			# Handle result like bla.domain
-			if(not "http" in website):
-				clean_url = "http://" + website
-				clean_url = '/'.join(clean_url.split('/',3)[:-1])
-
-			# Handle result like http://bla.domain
-			else:
-				clean_url = '/'.join(website.split('/',3)[:-1])
-
-			if(not clean_url in online_subdmn and domain in clean_url):
-				online_subdmn.append(clean_url)
-				print "\033[92mFound - \033[0m" + clean_url
-			
-		pool.terminate()
-	else:
-		print "[OPTION] Yahoo Scan disabled"
-
-# Extract subdomain from bing results
-def crawl_bing_for_subdomain(is_bing,domain,process):
-	if (is_bing):
-		print "\n[OPTION] Bing Scan enabled"
-		print "[+] Crawl from Bing..."
-		global online_subdmn
-
-		# Set a google URL for the multithread
-		bing = 'https://www.bing.com/search?q=site%3a{}+-www.{}&first='.format(domain,domain)
-
-		# Define number of results
-		stuff_that_needs_getting = []
-		for i in range(0,is_bing):
-			stuff_that_needs_getting.append(bing+str(i*10))
-
-		# Use multi threads
-		pool = multiprocessing.Pool(process)
-		pool_outputs = pool.map(crawl_website_for_subdomain_extract, stuff_that_needs_getting) #function, arg(=list of hosts)
-		pool.close()
-		pool.join()
-
-		# Threads are done, now let parse theirs results
-		bing_source = "".join(pool_outputs)
-		regex = re.compile(r'<li class="b_algo"><h2><a href="(.*?)"')
-		websites = regex.findall(bing_source)
-
-		for website in websites:
-			clean_url = ""
-					
-			# Handle result like bla.domain
-			if(not "http" in website):
-				clean_url = "http://" + website
-				clean_url = '/'.join(clean_url.split('/',3)[:-1])
-
-			# Handle result like http://bla.domain
-			else:
-				clean_url = '/'.join(website.split('/',3)[:-1])
-
-			if(not clean_url in online_subdmn and domain in clean_url):
-				online_subdmn.append(clean_url)
-				print "\033[92mFound - \033[0m" + clean_url
-			
-		pool.terminate()
-	else:
-		print "[OPTION] Bing Scan disabled"
-
+		print "[OPTION] {} Scan disabled".format(name)
 
 # Generating a report for every subdomain
 def generate_reports():

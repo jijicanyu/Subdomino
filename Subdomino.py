@@ -34,14 +34,14 @@ if __name__ == "__main__":
 	# Start a subdomain enumeration
 	init_enumeration(results.nmap)
 
-	# Option Google
-	crawl_google_for_subdomain(int(results.google),results.domain, int(results.threads)) 
+	# Scan on Google and cie
+	website_name   = ['Google', 'Yahoo', 'Bing']
+	website_option = [results.google, results.yahoo, results.bing]
+	website_regex  = [r'<cite.*?>([^\'" <>]+)<\/cite>',r'href="(.*?'+results.domain+'.*?)" referrerpolicy="origin"',r'<li class="b_algo"><h2><a href="(.*?)"']
+	website_url    = ['https://www.google.co.th/search?q=site:*.{} -www.{}&start=','https://search.yahoo.com/search?p=site%3A{}+-www.{}&b=', 'https://www.bing.com/search?q=site%3a{}+-www.{}&first=']
 
-	# Option Yahoo
-	crawl_yahoo_for_subdomain(int(results.yahoo),results.domain, int(results.threads)) 
-
-	# Option Bing
-	crawl_bing_for_subdomain(int(results.bing),results.domain, int(results.threads)) 
+	for opt_dork in zip(website_name, website_option, website_url, website_regex):
+		crawl_website_for_subdomain(opt_dork[0],int(opt_dork[1]), results.domain, int(results.threads), opt_dork[2], opt_dork[3])
 	
 	# Basic Function
 	brute_with_file(results.names, results.domain, int(results.threads))
