@@ -15,6 +15,7 @@ if __name__ == "__main__":
 	parser.add_argument('--all',    action ='store_true', dest='all',     help="Boolean All Web",     default=False)
 	parser.add_argument('--google', action ='store',      dest='google',  help="N° of Google page",   default=False)
 	parser.add_argument('--yahoo',  action ='store',      dest='yahoo',   help="N° of Yahoo page",    default=False)
+	parser.add_argument('--baidu',  action ='store',      dest='baidu',   help="N° of Baidu page",    default=False)
 	parser.add_argument('--bing',   action ='store',      dest='bing',    help="N° of Bing page",     default=False)
 	parser.add_argument('--names',  action ='store',      dest='names',   help="Names files",         default="names.txt")
 	parser.add_argument('--threads',action ='store',      dest='threads', help="Number of thread",    default=20)
@@ -29,16 +30,17 @@ if __name__ == "__main__":
 	if results.all != False:
 		results.google = 10
 		results.yahoo  = 10
+		results.baidu  = 10
 		results.bing   = 10
 
 	# Start a subdomain enumeration
 	init_enumeration(results.nmap)
 
 	# Scan on Google and cie
-	website_name   = ['Google', 'Yahoo', 'Bing']
-	website_option = [results.google, results.yahoo, results.bing]
-	website_regex  = [r'<cite.*?>([^\'" <>]+)<\/cite>',r'href="(.*?'+results.domain+'.*?)" referrerpolicy="origin"',r'<li class="b_algo"><h2><a href="(.*?)"']
-	website_url    = ['https://www.google.co.th/search?q=site:*.{} -www.{}&start=','https://search.yahoo.com/search?p=site%3A{}+-www.{}&b=', 'https://www.bing.com/search?q=site%3a{}+-www.{}&first=']
+	website_name   = ['Google', 'Yahoo', 'Bing', 'Baidu']
+	website_option = [results.google, results.yahoo, results.bing, results.baidu]
+	website_regex  = [r'<cite.*?>([^\'" <>]+)<\/cite>',r'href="(.*?'+results.domain+'.*?)" referrerpolicy="origin"',r'<li class="b_algo"><h2><a href="(.*?)"', r'<a.*?class="c-showurl".*?>(.*?)</a>']
+	website_url    = ['https://www.google.co.th/search?q=site:*.{} -www.{}&start=','https://search.yahoo.com/search?p=site%3A{}+-www.{}&b=', 'https://www.bing.com/search?q=site%3a{}+-www.{}&first=', 'http://www.baidu.com/s?wd=site%3A{}%20-www.{}&pn=']
 
 	for opt_dork in zip(website_name, website_option, website_url, website_regex):
 		crawl_website_for_subdomain(opt_dork[0],int(opt_dork[1]), results.domain, int(results.threads), opt_dork[2], opt_dork[3])

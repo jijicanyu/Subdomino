@@ -125,6 +125,7 @@ def crawl_website_for_subdomain(name,option_selected,domain,process,url,regex_op
 			else:
 				clean_url = '/'.join(website.split('/',3)[:-1])
 
+			clean_url = clean_url.replace('<b>','').replace('<','')
 			if(not clean_url in online_subdmn):
 				online_subdmn.append(clean_url)
 				print "\033[92mFound - \033[0m" + clean_url
