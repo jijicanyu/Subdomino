@@ -15,6 +15,7 @@ if __name__ == "__main__":
 	parser.add_argument('--all',    action ='store_true', dest='all',     help="Boolean All Web",     default=False)
 	parser.add_argument('--google', action ='store',      dest='google',  help="N° of Google page",   default=False)
 	parser.add_argument('--yahoo',  action ='store',      dest='yahoo',   help="N° of Yahoo page",    default=False)
+	parser.add_argument('--bing',   action ='store',      dest='bing',    help="N° of Bing page",     default=False)
 	parser.add_argument('--names',  action ='store',      dest='names',   help="Names files",         default="names.txt")
 	parser.add_argument('--threads',action ='store',      dest='threads', help="Number of thread",    default=20)
 	results = parser.parse_args()
@@ -28,6 +29,7 @@ if __name__ == "__main__":
 	if results.all != False:
 		results.google = 10
 		results.yahoo  = 10
+		results.bing   = 10
 
 	# Start a subdomain enumeration
 	init_enumeration(results.nmap)
@@ -37,6 +39,9 @@ if __name__ == "__main__":
 
 	# Option Yahoo
 	crawl_yahoo_for_subdomain(int(results.yahoo),results.domain, int(results.threads)) 
+
+	# Option Bing
+	crawl_bing_for_subdomain(int(results.bing),results.domain, int(results.threads)) 
 	
 	# Basic Function
 	brute_with_file(results.names, results.domain, int(results.threads))

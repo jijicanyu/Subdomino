@@ -3,7 +3,7 @@
 ```
 Warning : Need to be run as root in order to ping a domain, due to the socket use !
 ```
-An application that enumerates subdomains, and scan them with different rules
+An application that enumerates subdomains, and scan them with several rules
 
 ## Dependencies 
 * Ping-v0.2 - pip install ping
