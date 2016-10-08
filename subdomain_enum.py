@@ -134,6 +134,24 @@ def crawl_website_for_subdomain(name,option_selected,domain,process,url,regex_op
 	else:
 		print "[OPTION] {} Scan disabled".format(name)
 
+
+# Reverse DNS search with ptrarchive.com
+def reverse_dns_search(is_dns,domain):
+	if is_dns:
+		print "[OPTION] Reverse DNS for {} enabled".format(domain)
+		ptr_page = requests.get('http://ptrarchive.com/tools/search.htm?label={}'.format(domain)).text
+		regex = re.compile("(([\w]*?[\.]*){1,3}"+domain+")")
+
+		matches = regex.findall(ptr_page)
+		matches = set(matches)
+		global online_subdmn
+		matches_len = len(matches)
+
+		for index,m in enumerate(matches):
+			online_subdmn.append(multiprocessing_ping_scan(m[0].encode('utf8'),index,matches_len))
+	else:
+		print "[OPTION] Reverse DNS for {} disabled".format(domain)
+
 # Generating a report for every subdomain
 def generate_reports():
 	global online_subdmn
