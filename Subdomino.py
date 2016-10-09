@@ -18,14 +18,24 @@ if __name__ == "__main__":
 	parser.add_argument('--baidu',      action ='store',      dest='baidu',      help="N° of Baidu page",    default=False)
 	parser.add_argument('--bing',       action ='store',      dest='bing',       help="N° of Bing page",     default=False)
 	parser.add_argument('--reversedns', action ='store_true', dest='reversedns', help="Reverse DNS",         default=False)
+	parser.add_argument('--file',       action ='store',      dest='file',       help="Subdomain file",      default=False)
 	parser.add_argument('--names',      action ='store',      dest='names',      help="Names files",         default="names.txt")
 	parser.add_argument('--threads',    action ='store',      dest='threads',    help="Number of thread",    default=20)
 	results = parser.parse_args()
 
+	# Start a subdomain enumeration
+	init_enumeration(results.nmap)
+
+	# Subdomain's list provided by the user
+	if results.file != False:
+		results.domain = ""
+		load_file(results.file)
+
 	# Need a domain to start enumerating
-	if results.domain == None:
+	elif results.domain == None:
 		parser.print_help()
 		exit(-1)
+
 
 	# Handle crawling with every websites (yahoo, google, bing...)
 	if results.all != False:
@@ -34,9 +44,6 @@ if __name__ == "__main__":
 		results.baidu      = 10
 		results.bing       = 10
 		results.reversedns = True
-
-	# Start a subdomain enumeration
-	init_enumeration(results.nmap)
 
 	# Reverse DNS Search
 	reverse_dns_search(results.reversedns, results.domain)

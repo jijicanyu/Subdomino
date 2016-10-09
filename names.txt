@@ -46,6 +46,7 @@ www1
 img
 news
 portal
+github
 server
 wiki
 api

@@ -43,30 +43,31 @@ def multiprocessing_ping_scan(host,n_iter,n_max):
 
 # Generate a list of potential subdomain
 def brute_with_file(names_file,domain, process):
-	print "\n[+] Brute subdomain from {} with {} pools...".format(names_file, process)
-	global online_subdmn
+	if domain != "":
+		print "\n[+] Brute subdomain from {} with {} pools...".format(names_file, process)
+		global online_subdmn
 
-	# Subdomain extensions are stored in names.txt
-	with open(names_file,'r') as dict_file:
-		dict_file = dict_file.readlines()
+		# Subdomain extensions are stored in names.txt
+		with open(names_file,'r') as dict_file:
+			dict_file = dict_file.readlines()
 
-		pool = Pool(process)
+			pool = Pool(process)
 
-		# Multiprocessing
-		max_subdmn = len(dict_file)
-		for index,subdmn in enumerate(dict_file):
-			pool.apply_async(multiprocessing_ping_scan, ("http://"+subdmn.strip()+"."+domain, index, max_subdmn), callback=online_subdmn.append)
-    	
-    	# We need this to stop it with Ctrl+C
-		try:
-			time.sleep(10)
-			pool.close()
-			pool.join()
+			# Multiprocessing
+			max_subdmn = len(dict_file)
+			for index,subdmn in enumerate(dict_file):
+				pool.apply_async(multiprocessing_ping_scan, ("http://"+subdmn.strip()+"."+domain, index, max_subdmn), callback=online_subdmn.append)
+	    	
+	    	# We need this to stop it with Ctrl+C
+			try:
+				time.sleep(10)
+				pool.close()
+				pool.join()
 
-		except KeyboardInterrupt:
-			print " Multiprocessing stopped!"
-			pool.terminate()
-			pool.join()
+			except KeyboardInterrupt:
+				print " Multiprocessing stopped!"
+				pool.terminate()
+				pool.join()
 
 
 # Function for the multiprocessing crawl
@@ -89,7 +90,7 @@ def crawl_website_for_subdomain_extract(stuff_to_get):
 
 # Extract subdomain from google results
 def crawl_website_for_subdomain(name,option_selected,domain,process,url,regex_opt):
-	if (option_selected):
+	if (option_selected == True):
 		print "\n[OPTION] {} Scan enabled".format(name)
 		print "[+] Crawl from {}...".format(name)
 		global online_subdmn
@@ -137,7 +138,7 @@ def crawl_website_for_subdomain(name,option_selected,domain,process,url,regex_op
 
 # Reverse DNS search with ptrarchive.com
 def reverse_dns_search(is_dns,domain):
-	if is_dns:
+	if is_dns == True:
 		print "[OPTION] Reverse DNS for {} enabled".format(domain)
 		ptr_page = requests.get('http://ptrarchive.com/tools/search.htm?label={}'.format(domain)).text
 		regex = re.compile("(([\w]*?[\.]*){1,3}"+domain+")")
@@ -150,7 +151,18 @@ def reverse_dns_search(is_dns,domain):
 		for index,m in enumerate(matches):
 			online_subdmn.append(multiprocessing_ping_scan(m[0].encode('utf8'),index,matches_len))
 	else:
-		print "[OPTION] Reverse DNS for {} disabled".format(domain)
+		print "[OPTION] Reverse DNS disabled"
+
+
+
+
+def load_file(subdmn_list):
+	print "[OPTION] Load a subdomain's list from {}".format(subdmn_list)
+	global online_subdmn
+	with open(subdmn_list, 'r') as f:
+		lines = f.readlines()
+		for l in lines:
+			online_subdmn.append(l.strip())
 
 # Generating a report for every subdomain
 def generate_reports():
