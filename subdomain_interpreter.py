@@ -11,6 +11,7 @@ class Interpreter():
 	rules      = []
 	names      = []
 	subdomains = []
+	countIOV   = 0
 
 
 	def __init__(self, subdomains):
@@ -29,17 +30,23 @@ class Interpreter():
 	# Save IOV in the subdomains file
 	def report_IOV(self, name, subdomain, iov):
 		print "\t\033[1mIOV '" + iov + "' found : \033[0m"+ name + " for " + subdomain
-		path = "reports/"+subdomain.replace('://','_')
+		path = "reports/"+str(self.countIOV)+subdomain.replace('://','_')
+		old  = "reports/"+str(self.countIOV-1)+subdomain.replace('://','_')
+
+		if self.countIOV != 0:
+			os.rename(old,path)
+	
 		with open(path, 'a+') as f:
-			f.write('IOV '+ iov + ' - ' + name)
+			f.write('IOV '+ iov + ' - ' + name + '\n')
+			self.countIOV = self.countIOV + 1
 
 	# Function like "host" command to detect subdomain linking to an unclaimed tumblr/github/wordpress
 	def take_over_dns_based(self,subdomain):
-		print "Take over - DNS Method"
 		try:
 			bla  = dns.resolver.Resolver() 
 			host = subdomain.replace('http://','').replace('https://','')
 			ans  = bla.query(host, 'CNAME') 
+			print "Take over - DNS Method"
 			for a in ans:
 				# Replace the last "." in the CNAME record
 				host   = "http://"+a.to_text()[:-1]
@@ -65,12 +72,11 @@ class Interpreter():
 					print "IOV 404 Page found in subdomain at {}".format(host)
 					self.report_IOV(host, subdomain, "Unclaimed GitHub")
 			
-		except dns.exception.DNSException:
-			print "DNS query failed"
+		except dns.exception.DNSException,e:
+			print "DNS query failed",e
 
 	# Check resource of the website
 	def take_over_external_resources(self,r):
-		print "Take over External Resource"
 		found        = []
 		regex_script = re.compile("<script .*?src=[\"|'](.*?)[\"|']")
 		find_script  = regex_script.findall(r.text)
@@ -90,6 +96,7 @@ class Interpreter():
 
 
 		# Detect active ?
+		print "Take over External Resource"
 		for link in found:
 
 			# // should be treated like http://
@@ -97,7 +104,13 @@ class Interpreter():
 				link = link.replace('//','http://')
 
 			# Ping only external
-			if link[0:4] == 'http':
+			if link[0:5] == 'https':
+				domain = link.replace('https://','').split('/')[0]
+				if scan_subdomain(domain) == False:
+					print "IOV 404 External resource found in subdomain at {}".format(domain)
+					self.report_IOV("404 or Down External resource", domain, "resource_down")
+
+			elif link[0:4] == 'http':
 				domain = link.replace('http://','').split('/')[0]
 				if scan_subdomain(domain) == False:
 					print "IOV 404 External resource found in subdomain at {}".format(domain)
@@ -207,5 +220,6 @@ class Interpreter():
 				self.take_over_dns_based(subdomain)
 				self.take_over_external_resources(r)
 				self.rules_engine(r, subdomain)
+				self.countIOV = 0
 			except Exception, e:
 				pass
