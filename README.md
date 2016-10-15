@@ -1,4 +1,4 @@
-# Subdomino
+# Subdomino [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) 
 ![Image of Subdomino](http://image.noelshack.com/fichiers/2016/39/1475404267-capture-d-ecran-de-2016-10-02-17-28-57.png)
 ```
 Warning : Need to be run as root in order to ping a domain, due to the socket use !
@@ -8,6 +8,7 @@ An application that enumerates subdomains, and scan them with several rules
 ## Dependencies 
 * Ping-v0.2 - pip install ping
 * Argparse  - pip install argparse
+* DnsPython - pip install dnspython
 
 
 ## Features
@@ -54,3 +55,4 @@ You can also chain several rules with **AND** operator like this
 ```
 rule: is_string_page("hash") AND regex_match_page("jquery.*?(1).([0-7]).([0-9]+)")
 ```
+====

@@ -3,6 +3,7 @@
 import re
 import os
 import sys
+import dns.resolver
 import requests
 
 class Interpreter():
@@ -31,6 +32,48 @@ class Interpreter():
 		path = "reports/"+subdomain.replace('://','_')
 		with open(path, 'a+') as f:
 			f.write('IOV '+ iov + ' - ' + name)
+
+
+	# Function like "host" command to detect subdomain linking to an unclaimed tumblr/github/wordpress
+	def take_over_dns_based(self,subdomain):
+		print "Take over - DNS Method"
+		try:
+			bla  = dns.resolver.Resolver() 
+			host = subdomain.replace('http://','').replace('https://','')
+			ans  = bla.query(host, 'CNAME') 
+			for a in ans:
+				# Replace the last "." in the CNAME record
+				host   = "http://"+a.to_text()[:-1]
+				source = requests.get(host).text
+
+				# Github
+				if "There isn't a GitHub Pages site here" in source:
+					print "IOV Found unclaimed github at {}".format(host)
+					self.report_IOV(host, subdomain, "Unclaimed GitHub")
+
+				# Wordpress
+				if "Do you want to register" in source:
+					print "IOV Found unclaimed Wordpress at {}".format(host)
+					self.report_IOV(host, subdomain, "Unclaimed Wordpress")
+
+				# Tumblr
+				if "There's nothing here." in source:
+					print "IOV Found unclaimed Tumblr at {}".format(host)
+					self.report_IOV(host, subdomain, "Unclaimed Tumblr")
+
+				# Other unknown
+				elif "404" in source:
+					print "IOV 404 Page found in subdomain at {}".format(host)
+					self.report_IOV(host, subdomain, "Unclaimed GitHub")
+			
+		except dns.exception.DNSException:
+			print "DNS query failed"
+
+	# Check resource of the website
+	def take_over_external_resources(self,r):
+		print "Take over External Resource"
+		return
+
 
 
 	"""	<Start Of Rules> """
@@ -134,6 +177,8 @@ class Interpreter():
 		for subdomain in  self.subdomains:
 			try:
 				r = requests.get(subdomain, timeout=5)
+				self.take_over_dns_based(subdomain)
+				self.take_over_external_resources(r)
 				self.rules_engine(r, subdomain)
 			except Exception, e:
 				pass
