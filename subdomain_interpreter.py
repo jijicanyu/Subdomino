@@ -5,6 +5,7 @@ import os
 import sys
 import dns.resolver
 import requests
+from subdomain_scan import *
 
 class Interpreter():
 	rules      = []
@@ -24,7 +25,6 @@ class Interpreter():
 					self.names.append(l.strip('\n').replace('name: ',''))
 				if l[0:6] == "rule: ":
 					self.rules.append(l.strip('\n').replace('rule: ',''))
-
 		
 	# Save IOV in the subdomains file
 	def report_IOV(self, name, subdomain, iov):
@@ -32,7 +32,6 @@ class Interpreter():
 		path = "reports/"+subdomain.replace('://','_')
 		with open(path, 'a+') as f:
 			f.write('IOV '+ iov + ' - ' + name)
-
 
 	# Function like "host" command to detect subdomain linking to an unclaimed tumblr/github/wordpress
 	def take_over_dns_based(self,subdomain):
@@ -72,8 +71,37 @@ class Interpreter():
 	# Check resource of the website
 	def take_over_external_resources(self,r):
 		print "Take over External Resource"
-		return
+		found        = []
+		regex_script = re.compile("<script .*?src=[\"|'](.*?)[\"|']")
+		find_script  = regex_script.findall(r.text)
+		found        += find_script
+		
+		regex_iframe = re.compile("<iframe .*?src=[\"|'](.*?)[\"|']")
+		find_iframe  = regex_iframe.findall(r.text)
+		found        += find_iframe
+		
+		regex_object = re.compile("<object .*?data=[\"|'](.*?)[\"|']")
+		find_object  = regex_object.findall(r.text)
+		found        += find_object
+		
+		regex_svg    = re.compile("<svg .*?src=[\"|'](.*?)[\"|']")
+		find_svg     = regex_svg.findall(r.text)
+		found        += find_svg
 
+
+		# Detect active ?
+		for link in found:
+
+			# // should be treated like http://
+			if link[0:2]=='//':
+				link = link.replace('//','http://')
+
+			# Ping only external
+			if link[0:4] == 'http':
+				domain = link.replace('http://','').split('/')[0]
+				if scan_subdomain(domain) == False:
+					print "IOV 404 External resource found in subdomain at {}".format(domain)
+					self.report_IOV("404 or Down External resource", domain, "resource_down")
 
 
 	"""	<Start Of Rules> """
@@ -168,7 +196,6 @@ class Interpreter():
 					# regex_match_header()
 					if self.rule_regex_match_header(r,part):
 						self.report_IOV(name, subdomain, "regex_match_header")
-
 
 
 	# Start a scan with the rules for every subdomains

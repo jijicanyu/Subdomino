@@ -36,6 +36,7 @@ if __name__ == "__main__":
 		parser.print_help()
 		exit(-1)
 
+
 	# Handle crawling with every websites (yahoo, google, bing...)
 	if results.all != False:
 		results.google     = 10
