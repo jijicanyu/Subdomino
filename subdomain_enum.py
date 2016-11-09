@@ -90,7 +90,7 @@ def crawl_website_for_subdomain_extract(stuff_to_get):
 
 # Extract subdomain from google results
 def crawl_website_for_subdomain(name,option_selected,domain,process,url,regex_opt):
-	if (option_selected == True):
+	if (option_selected != False):
 		print "\n[OPTION] {} Scan enabled".format(name)
 		print "[+] Crawl from {}...".format(name)
 		global online_subdmn

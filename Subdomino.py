@@ -44,6 +44,7 @@ if __name__ == "__main__":
 		results.bing       = 10
 		results.reversedns = True
 
+
 	# Reverse DNS Search
 	reverse_dns_search(results.reversedns, results.domain)
 
@@ -55,7 +56,7 @@ if __name__ == "__main__":
 
 	for opt_dork in zip(website_name, website_option, website_url, website_regex):
 		crawl_website_for_subdomain(opt_dork[0],int(opt_dork[1]), results.domain, int(results.threads), opt_dork[2], opt_dork[3])
-	
+
 	# Basic Function
 	brute_with_file(results.names, results.domain, int(results.threads))
 
